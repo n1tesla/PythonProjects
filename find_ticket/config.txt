@@ -1,0 +1,16 @@
+[LOCATION]
+start=Ankara Gar
+destination=Gebze
+date=25.01.2023
+
+
+
+[INFORMATIONS]
+sender_email=tnakyol1@gmail.com
+receiver_email=tnakyol1@gmail.com
+password=pvwioejicbcuzemr
+
+
+[SERVER]
+port=587
+smtp_server=smtp.gmail.com

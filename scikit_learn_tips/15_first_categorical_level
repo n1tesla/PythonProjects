@@ -1,0 +1,4 @@
+In most cases, I recommend that you don't use drop='first' with OnehotEncoder. Here's why:
+1. Multicollinearity is rarely an issua with scikit-learn models
+2. drop='first' is incompatible with handle_unknown='ignore'
+3. maybe problematic if you standardize all features or use a regularized model

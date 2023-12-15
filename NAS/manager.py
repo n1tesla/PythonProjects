@@ -1,6 +1,6 @@
 import numpy as np
 from keras.models import Model
-from keras import backend as K
+from tensorflow.python.keras import backend as K
 from keras.callbacks import ModelCheckpoint
 import tensorflow as tf
 from keras.optimizers import RMSprop
@@ -59,14 +59,14 @@ class NetworkManager:
         Returns:
             a reward for training a models with the given actions
         '''
-        with tf.Session(graph=tf.Graph()) as network_sess:
+        with tf.compat.v1.Session(graph=tf.Graph()) as network_sess:
             K.set_session(network_sess)
 
             # generate a submodel given predicted actions
             model = model_fn(actions)  # type: Model
             # model.compile('adam', 'categorical_crossentropy', metrics=['accuracy'])
 
-            model.compile(loss='mean_squared_error', optimizer=RMSprop(),metrics=['mae'])
+            model.compile(loss='mean_squared_error', optimizer='rmsprop',metrics=['mae'])
 
             # unpack the dataset
             X_train, y_train, X_val, y_val = self.dataset
@@ -75,7 +75,7 @@ class NetworkManager:
             model.fit(X_train, y_train, batch_size=self.batchsize, epochs=self.epochs,
                       verbose=1, validation_data=(X_val, y_val),
                       callbacks=[ModelCheckpoint('weights/temp_network.h5',
-                                                 monitor='val_acc', verbose=1,
+                                                 monitor='val_loss', verbose=1,
                                                  save_best_only=True,
                                                  save_weights_only=True)])
 

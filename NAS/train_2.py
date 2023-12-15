@@ -19,7 +19,7 @@ def train(config,X_train,y_train,X_test,y_test):
 
     state_space.add_state(name='units',values=[64,128,256])
     state_space.print_state_space()
-    input_shape=X_train.shape[1:]
+
     dataset = [X_train, y_train, X_test, y_test]  # pack the dataset for the NetworkManager
 
     previous_acc = 0.0

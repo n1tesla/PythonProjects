@@ -1,0 +1,43 @@
+DATA:
+    QUICK_DATA:
+      window_size : [30]
+      stride_size : [1]
+      features : ["close"]
+      id_features: ["date"]
+      scaler : [standard]
+      validation_ratio: [ 0.1 ]
+    MID_DATA:
+      window_size: [16,24,32]
+      stride_size: [2,4]
+      features : ["close"]
+      id_features: ["date"]
+      scaler: [minmax]
+      validation_ratio: [0.2]
+
+
+
+QUICK:
+  ANOMALY:
+    LSTM:
+      module_name : "lstm"
+      network_name : "LSTM_AnomalyNetwork"
+      batch_size : [512]
+      epochs : 5
+      max_trials : 2
+
+
+MID:
+  ANOMALY:
+    LSTM:
+      module_name : "lstm"
+      network_name : "LSTM_RegNetwork"
+      batch_size : [256]
+      epochs : 4000
+      max_trials : 30
+
+
+
+
+
+
+

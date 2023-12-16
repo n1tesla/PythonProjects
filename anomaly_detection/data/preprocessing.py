@@ -80,6 +80,7 @@ class PREPARATION:
 
         WindowedX = np.concatenate(WindowedX, axis=0)
         WindowedY = np.concatenate(WindowedY, axis=0)
+        print(f"WindowedX_Shape: {WindowedX.shape}, WindowedY_Shape: {WindowedY.shape}")
         # WindowedY=WindowedY.reshape(WindowedY.shape[0])
         #shuffling windows in list
         # idx = np.random.permutation(len(WindowedX))

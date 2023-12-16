@@ -104,27 +104,27 @@ class DeepRegressor:
                                   model_path)
             graphs.train_evaluation_graphs(history, model_path, index)
 
-    def save(self, trial, model,index,history):
-        import mlflow
-        hp_config = {}
-        hp_config.update(trial.values)
-        lr=trial["learning_rate"]
-
-        no_of_model=f"{self.parameters_dict['window_size']}ws_{self.parameters_dict['stride_size']}ss_" \
-                    f"{self.parameters_dict['scaler_type']}_{self.parameters_dict['val_ratio']}vr_{index}"
-        #no_of_model=f"{self.observation_name}_lr{str(lr)[:8]}_{self.start_time[-4:]}_{index}"
-
-        model_path=os.path.join(self.models_dir,no_of_model)
-        utils.make_dir(model_path)
-        model.save(model_path)
-        THRESHOLD = 0.4
-        train_mae_loss, test_mae_loss=evaluate.model_test(
-                            model=model,
-                            dataset_dict=self.dataset_dict)
-
-        graphs.plot_distplot(train_mae_loss,model_path)
-        graphs.plot_anomalies(self.df_test,self.parameters_dict['window_size'],test_mae_loss,THRESHOLD,self.scaler,model_path)
-        graphs.train_evaluation_graphs(history, model_path, index)
+    # def save(self, trial, model,index,history):
+    #     import mlflow
+    #     hp_config = {}
+    #     hp_config.update(trial.values)
+    #     lr=trial["learning_rate"]
+    #
+    #     no_of_model=f"{self.parameters_dict['window_size']}ws_{self.parameters_dict['stride_size']}ss_" \
+    #                 f"{self.parameters_dict['scaler_type']}_{self.parameters_dict['val_ratio']}vr_{index}"
+    #     #no_of_model=f"{self.observation_name}_lr{str(lr)[:8]}_{self.start_time[-4:]}_{index}"
+    #
+    #     model_path=os.path.join(self.models_dir,no_of_model)
+    #     utils.make_dir(model_path)
+    #     model.save(model_path)
+    #     THRESHOLD = 0.4
+    #     train_mae_loss, test_mae_loss=evaluate.model_test(
+    #                         model=model,
+    #                         dataset_dict=self.dataset_dict)
+    #
+    #     graphs.plot_distplot(train_mae_loss,model_path)
+    #     graphs.plot_anomalies(self.df_test,self.parameters_dict['window_size'],test_mae_loss,THRESHOLD,self.scaler,model_path)
+    #     graphs.train_evaluation_graphs(history, model_path, index)
 
 
 

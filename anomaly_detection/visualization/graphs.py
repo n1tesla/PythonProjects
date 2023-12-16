@@ -32,10 +32,11 @@ def plot_anomalies(df_test,window_size,test_mae_loss,THRESHOLD,scaler,model_path
     );
     arr_anomalies=anomalies.close.to_numpy()
     arr_anomalies=np.expand_dims(arr_anomalies,axis=1)
-
+    data=pd.DataFrame({'anomalies_index':anomalies.index,'anomalies':scaler.inverse_transform(arr_anomalies)})
     sns.scatterplot(
-        x=anomalies.index,
-        y=scaler.inverse_transform(arr_anomalies),
+        data,
+        x='anomalies_index',
+        y='anomalies',
         color=sns.color_palette()[3],
         s=52,
         label='anomaly'
@@ -50,19 +51,9 @@ def plot_anomalies(df_test,window_size,test_mae_loss,THRESHOLD,scaler,model_path
     # plot_path_2 = model_path / f"anomalies.png"
     # plt.savefig(plot_path_2)
 
-def plot_result(y_true: np.ndarray, y_pred: np.ndarray, model_path: str,plots_path , index: int,
+def plot_result(y_true: np.ndarray, y_pred: np.ndarray, model_path: str, index: int,
                 result:pd.DataFrame):
-    """
 
-    @param y_true:
-    @param y_pred:
-    @param model_path:
-    @param plots_path:
-    @param index:
-    @param observation_name:
-    @param result:
-    @return:
-    """
     result_string = ""
 
     for column_name, value in result.iloc[0].items():
@@ -84,7 +75,7 @@ def plot_result(y_true: np.ndarray, y_pred: np.ndarray, model_path: str,plots_pa
     plt.close()
 
 
-def train_evaluation_graphs(history, model_path: str, plots_path: str, index: int):
+def train_evaluation_graphs(history, model_path: str, index: int):
 
 
     fig_acc = plt.figure(figsize=(10, 10))

@@ -2,6 +2,7 @@ import os
 from json import dump
 import numpy as np
 import pandas as pd
+import pickle
 
 
 class PREPARATION:
@@ -10,20 +11,24 @@ class PREPARATION:
                  window_size,
                  stride_size,
                  scaler_type,
-                 val_ratio):
+                 ):
+
         self.config=config
         self.window_size=window_size
         self.stride_size=stride_size
         self.scaler_type=scaler_type
-        self.val_ratio=val_ratio
 
 
     def create_dataset(self,data_path):
+
         df=self.read_data()
         train,test=self.split_data(df)
         df_train,df_test,scaler=self.scale_data(train,test,data_path)
         dataset_dict= {'df_train': df_train, 'df_test': df_test}
+
         for k, v in dataset_dict.items():
+            #putting X and y into dictionary.
+            # {'df_train': [X_train_array, y_train_array], 'df_test': [X_test_array,y_test_array]}
             dataset_dict[k] = self.SlidingWindow(v)
         return dataset_dict,df_train,df_test,scaler
 
@@ -34,11 +39,10 @@ class PREPARATION:
 
 
     def split_data(self,df):
-        train_size = int(len(df) * (1-self.val_ratio))
-        test_size = len(df) - train_size
-        train, test = df.iloc[0:train_size], df.iloc[train_size:len(df)]
-        print(train.shape, test.shape)
-        return train,test
+        train_size = int(len(df) * (1-self.config.test_ratio))
+        df_train, df_test = df.iloc[0:train_size], df.iloc[train_size:]
+        print(f"Train size: {train_size}, Test size: {len(df)-train_size}")
+        return df_train, df_test
 
 
     def scale_data(self,df_train=None, df_test=None,data_path=None):
@@ -57,9 +61,11 @@ class PREPARATION:
         assert scaler_model is not None, f"Choose a valid scaler by using 'robust', 'minmax' or 'standard' keywords"
 
         df_train.loc[:, ['close']] = scaler_model.fit_transform(df_train.loc[:,['close']].values)
-        df_test.loc[:, ['close']] = scaler_model.transform((df_test.loc[:,['close']].values))
+        df_test.loc[:, ['close']] = scaler_model.transform(df_test.loc[:,['close']].values)
         # dump(scaler_model, open(os.path.join(data_path, "scaler.bin"), "wb"))
 
+        with open(os.path.join(data_path, "scaler.bin"), "wb") as file:
+            pickle.dump(scaler_model, file)
         return df_train,df_test,scaler_model
 
     def SlidingWindow(self, df: pd.core.frame.DataFrame) -> list:
@@ -71,7 +77,6 @@ class PREPARATION:
         arr=df.to_numpy()
         WindowedX.append(extract_window(arr, self.window_size, self.stride_size))
         WindowedY.append(extract_labels(arr, self.window_size, self.stride_size))
-
 
         WindowedX = np.concatenate(WindowedX, axis=0)
         WindowedY = np.concatenate(WindowedY, axis=0)

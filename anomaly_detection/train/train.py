@@ -15,9 +15,6 @@ class DeepRegressor:
                  dataset_dict:dict,
                  config:dict,
                  models_dir:str,
-                 plots_dir:str,
-                 observation_name:str,
-                 start_time:str,
                  parameters_dict:dict,
                  scaler,
                  df_test):
@@ -25,9 +22,6 @@ class DeepRegressor:
         self.dataset_dict=dataset_dict
         self.config=config
         self.models_dir=models_dir
-        self.plots_dir=plots_dir
-        self.observation_name=observation_name
-        self.start_time=start_time
         self.parameters_dict=parameters_dict
         self.scaler=scaler
         self.df_test=df_test
@@ -74,9 +68,12 @@ class DeepRegressor:
 
 
     def fit(self):
-        df_batch_results=pd.DataFrame([])
         tuner=self.search_hyperparam()
         best_hps=tuner.get_best_hyperparameters(self.config.max_trials)
+
+        return tuner, best_hps
+
+    def save_2(self, tuner, best_hps):
         callbacks = self.define_callback(early_stop=True, reduceLR=True, tensorboard=True)
 
         for index, trial in enumerate(best_hps):
@@ -84,12 +81,28 @@ class DeepRegressor:
             history=model.fit(self.X_train,self.y_train,validation_split=self.parameters_dict["val_ratio"],epochs=self.config.epochs,callbacks=callbacks,
                               batch_size=self.parameters_dict['batch_size'],verbose=1,use_multiprocessing=True)
 
-            df_result=self.save(trial, model, index,history)
+            hp_config = {}
+            hp_config.update(trial.values)
+            lr = trial["learning_rate"]
+            record_name = f"{self.parameters_dict['window_size']}ws_{self.parameters_dict['stride_size']}ss_" \
+                          f"{self.parameters_dict['scaler_type']}_{self.parameters_dict['val_ratio']}vr_{index}"
 
-            df_batch_results=pd.concat([df_batch_results,df_result])
+            # model_path=os.path.join(self.models_dir,record_name)
+            # utils.make_dir(model_path)
+            model_path= self.models_dir / record_name
+            model_path.mkdir(exist_ok=True)
+            model.save(model_path)
 
-        return df_batch_results
+            train_mae_loss, test_mae_loss = evaluate.model_test(model, self.X_train, self.X_test)
 
+            graphs.plot_distplot(train_mae_loss, model_path)
+            graphs.plot_anomalies(self.df_test,
+                                  self.parameters_dict['window_size'],
+                                  test_mae_loss,
+                                  self.config.THRESHOLD,
+                                  self.scaler,
+                                  model_path)
+            graphs.train_evaluation_graphs(history, model_path, index)
 
     def save(self, trial, model,index,history):
         import mlflow
@@ -111,7 +124,7 @@ class DeepRegressor:
 
         graphs.plot_distplot(train_mae_loss,model_path)
         graphs.plot_anomalies(self.df_test,self.parameters_dict['window_size'],test_mae_loss,THRESHOLD,self.scaler,model_path)
-        graphs.train_evaluation_graphs(history, model_path, self.plots_dir, index)
+        graphs.train_evaluation_graphs(history, model_path, index)
 
 
 

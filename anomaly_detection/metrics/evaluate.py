@@ -4,13 +4,12 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 
 
-def model_test( model, dataset_dict: dict, ):
+def model_test( model, X_train, X_test ):
 
     y_pred=None
 
     df_result = pd.DataFrame([])
-    X_train, y_train= dataset_dict['df_train'][0], dataset_dict['df_train'][1]
-    X_test,y_test=dataset_dict['df_test'][0], dataset_dict['df_test'][1]
+
     X_train_pred=model.predict(X_train)
     train_mae_loss=np.mean(np.abs(X_train_pred-X_train),axis=1)
     #more than train_mae_loss will be anomaly

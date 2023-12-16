@@ -40,10 +40,8 @@ def make_paths(observation_name:str,start_time:str)-> tuple:
     models_dir=time_path/ "models"
     models_dir.mkdir(exist_ok=True)
 
-    plots_dir=time_path / "plots"
-    plots_dir.mkdir(exist_ok=True)
 
-    return time_path,data_path,models_dir,plots_dir
+    return time_path,data_path,models_dir
 
 
 def create_start_time():

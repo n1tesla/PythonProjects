@@ -1,11 +1,13 @@
 DATA:
     QUICK_DATA:
       window_size : [30]
-      stride_size : [1]
+      stride_size : [2]
       features : ["close"]
       id_features: ["date"]
       scaler : [standard]
-      validation_ratio: [ 0.1 ]
+      validation_ratio: [ 0.15 ]
+      test_ratio: [0.15]
+      THRESHOLD: 0.5
     MID_DATA:
       window_size: [16,24,32]
       stride_size: [2,4]
